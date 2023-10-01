@@ -1,5 +1,5 @@
 {
-  "name": "aws-step-function-batch-sample",
+  "name": "@aws-samples/aws-step-function-batch-sample",
   "description": "An example of a step function that manages a series of batch jobs with N to N behaviour",
   "version": "1.0.0",
   "bin": {
