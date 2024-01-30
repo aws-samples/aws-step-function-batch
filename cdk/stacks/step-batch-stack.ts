@@ -1,5 +1,5 @@
 import { Duration, PhysicalName, Stack } from "aws-cdk-lib";
-import { FlowLogDestination, FlowLogTrafficType, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
+import { FlowLogDestination, FlowLogTrafficType, IpAddresses, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Volume } from "aws-cdk-lib/aws-ecs";
 import { AccessPoint, FileSystem } from "aws-cdk-lib/aws-efs";
 import { Runtime, FileSystem as lfs } from "aws-cdk-lib/aws-lambda";
@@ -21,6 +21,7 @@ import { BatchJob } from "../constructs/batch-job";
 import {
   Choice,
   Condition,
+  DefinitionBody,
   IntegrationPattern,
   JsonPath,
   LogLevel,
@@ -47,7 +48,7 @@ export class StepBatchStack extends Stack {
 
     // VPC for the batch jobs to act within
     const vpc = new Vpc(this, "BatchVpc", {
-      cidr: "100.64.0.0/22",
+      ipAddresses: IpAddresses.cidr("100.64.0.0/22"),
       flowLogs: {
         allTraffic: {
           destination: FlowLogDestination.toCloudWatchLogs(),
@@ -325,7 +326,7 @@ export class StepBatchStack extends Stack {
     // 5. Run the 'Check back jobs' lambda
     // 6. Decide: If not finished, run step 5 again. Otherwise finish.
     const stateMachine = new StateMachine(this, "BatchStateMachine", {
-      definition: startInitJob
+      definitionBody: DefinitionBody.fromChainable(startInitJob
         .next(stepOne)
         .next(stepTwo)
         .next(stepThree)
@@ -335,6 +336,7 @@ export class StepBatchStack extends Stack {
             .when(Condition.booleanEquals("$.check.Payload.finished", true), batchFinished)
             .when(Condition.booleanEquals("$.check.Payload.finished", false), wait30.next(checkJob))
         ),
+      ),
       logs: { destination: stepFunctionLogGroup, level: LogLevel.ALL },
       tracingEnabled: true,
     });
