@@ -1,3 +1,5 @@
+*Note: This repo is no longer maintained and provided as is as a sample*
+
 # Step function Managed Batch Job connected through a common EFS volume
 
 This project is an example of using [AWS Step functions](https://aws.amazon.com/step-functions/?step-functions.sort-by=item.additionalFields.postDateTime&step-functions.sort-order=desc) to manage and track a series of [AWS Batch](https://aws.amazon.com/batch/) jobs in [N_TO_N mode](https://docs.aws.amazon.com/batch/latest/userguide/array_jobs.html).
